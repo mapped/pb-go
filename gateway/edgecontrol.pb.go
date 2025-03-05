@@ -230,6 +230,7 @@ type MappingKeyAndResult struct {
 	// The mappingKey where the this result originated from
 	MappingKey string `protobuf:"bytes,1,opt,name=mapping_key,json=mappingKey,proto3" json:"mapping_key,omitempty"`
 	// The result code
+	// mapped.cloud.types.ControlResult result = 2;
 	Result types.ControlResult `protobuf:"varint,2,opt,name=result,proto3,enum=mapped.cloud.types.ControlResult" json:"result,omitempty"`
 	// Error description (if available)
 	ErrorDescription string `protobuf:"bytes,3,opt,name=error_description,json=errorDescription,proto3" json:"error_description,omitempty"`
