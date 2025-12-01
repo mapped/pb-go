@@ -37,6 +37,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Depricate once it's supported in graphQl schemas
 type MimeType int32
 
 const (
