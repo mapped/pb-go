@@ -49,13 +49,21 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NiagaraServiceClient interface {
+	// List immediate children of a component, with optional filtering and pagination
 	ListChildComponents(ctx context.Context, in *ListChildComponentsRequest, opts ...grpc.CallOption) (*ListChildComponentsResponse, error)
+	// Find components across the station with optional filtering and pagination
 	FindComponents(ctx context.Context, in *FindComponentsRequest, opts ...grpc.CallOption) (*FindComponentsResponse, error)
+	// Get summaries for specific components by reference
 	GetComponentSummary(ctx context.Context, in *GetComponentSummaryRequest, opts ...grpc.CallOption) (*GetComponentSummaryResponse, error)
+	// Get detailed information for specific components by reference
 	GetComponentDetails(ctx context.Context, in *GetComponentDetailsRequest, opts ...grpc.CallOption) (*GetComponentDetailsResponse, error)
+	// Get all ancestors of a component, ordered from immediate parent to root
 	GetComponentAncestors(ctx context.Context, in *GetComponentAncestorsRequest, opts ...grpc.CallOption) (*GetComponentAncestorsResponse, error)
+	// Subscribe or unsubscribe to all data points of a device, with optional polling interval for unsubscribed devices
 	UpsertDeviceSubscription(ctx context.Context, in *UpsertDeviceSubscriptionRequest, opts ...grpc.CallOption) (*UpsertDeviceSubscriptionResponse, error)
+	// Reset the station connection, clearing all caches and subscriptions. Use for testing or recovery from errors.
 	Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error)
+	// Simple health check for connectivity and authentication. Use for testing or monitoring.
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 }
 
@@ -143,13 +151,21 @@ func (c *niagaraServiceClient) Ping(ctx context.Context, in *PingRequest, opts .
 // All implementations must embed UnimplementedNiagaraServiceServer
 // for forward compatibility
 type NiagaraServiceServer interface {
+	// List immediate children of a component, with optional filtering and pagination
 	ListChildComponents(context.Context, *ListChildComponentsRequest) (*ListChildComponentsResponse, error)
+	// Find components across the station with optional filtering and pagination
 	FindComponents(context.Context, *FindComponentsRequest) (*FindComponentsResponse, error)
+	// Get summaries for specific components by reference
 	GetComponentSummary(context.Context, *GetComponentSummaryRequest) (*GetComponentSummaryResponse, error)
+	// Get detailed information for specific components by reference
 	GetComponentDetails(context.Context, *GetComponentDetailsRequest) (*GetComponentDetailsResponse, error)
+	// Get all ancestors of a component, ordered from immediate parent to root
 	GetComponentAncestors(context.Context, *GetComponentAncestorsRequest) (*GetComponentAncestorsResponse, error)
+	// Subscribe or unsubscribe to all data points of a device, with optional polling interval for unsubscribed devices
 	UpsertDeviceSubscription(context.Context, *UpsertDeviceSubscriptionRequest) (*UpsertDeviceSubscriptionResponse, error)
+	// Reset the station connection, clearing all caches and subscriptions. Use for testing or recovery from errors.
 	Reset(context.Context, *ResetRequest) (*ResetResponse, error)
+	// Simple health check for connectivity and authentication. Use for testing or monitoring.
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	mustEmbedUnimplementedNiagaraServiceServer()
 }
