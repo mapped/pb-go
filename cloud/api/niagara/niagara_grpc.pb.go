@@ -43,6 +43,7 @@ const (
 	NiagaraService_UpsertDeviceSubscription_FullMethodName = "/mapped.cloud.api.niagara.NiagaraService/UpsertDeviceSubscription"
 	NiagaraService_Reset_FullMethodName                    = "/mapped.cloud.api.niagara.NiagaraService/Reset"
 	NiagaraService_Ping_FullMethodName                     = "/mapped.cloud.api.niagara.NiagaraService/Ping"
+	NiagaraService_SearchChildComponents_FullMethodName    = "/mapped.cloud.api.niagara.NiagaraService/SearchChildComponents"
 )
 
 // NiagaraServiceClient is the client API for NiagaraService service.
@@ -65,6 +66,8 @@ type NiagaraServiceClient interface {
 	Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error)
 	// Simple health check for connectivity and authentication. Use for testing or monitoring.
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
+	// Search for child components matching criteria, returning summaries with pagination. More flexible than ListChildComponents.
+	SearchChildComponents(ctx context.Context, in *SearchChildComponentsRequest, opts ...grpc.CallOption) (*SearchChildComponentsResponse, error)
 }
 
 type niagaraServiceClient struct {
@@ -147,6 +150,15 @@ func (c *niagaraServiceClient) Ping(ctx context.Context, in *PingRequest, opts .
 	return out, nil
 }
 
+func (c *niagaraServiceClient) SearchChildComponents(ctx context.Context, in *SearchChildComponentsRequest, opts ...grpc.CallOption) (*SearchChildComponentsResponse, error) {
+	out := new(SearchChildComponentsResponse)
+	err := c.cc.Invoke(ctx, NiagaraService_SearchChildComponents_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NiagaraServiceServer is the server API for NiagaraService service.
 // All implementations must embed UnimplementedNiagaraServiceServer
 // for forward compatibility
@@ -167,6 +179,8 @@ type NiagaraServiceServer interface {
 	Reset(context.Context, *ResetRequest) (*ResetResponse, error)
 	// Simple health check for connectivity and authentication. Use for testing or monitoring.
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
+	// Search for child components matching criteria, returning summaries with pagination. More flexible than ListChildComponents.
+	SearchChildComponents(context.Context, *SearchChildComponentsRequest) (*SearchChildComponentsResponse, error)
 	mustEmbedUnimplementedNiagaraServiceServer()
 }
 
@@ -197,6 +211,9 @@ func (UnimplementedNiagaraServiceServer) Reset(context.Context, *ResetRequest) (
 }
 func (UnimplementedNiagaraServiceServer) Ping(context.Context, *PingRequest) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedNiagaraServiceServer) SearchChildComponents(context.Context, *SearchChildComponentsRequest) (*SearchChildComponentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchChildComponents not implemented")
 }
 func (UnimplementedNiagaraServiceServer) mustEmbedUnimplementedNiagaraServiceServer() {}
 
@@ -355,6 +372,24 @@ func _NiagaraService_Ping_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NiagaraService_SearchChildComponents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchChildComponentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NiagaraServiceServer).SearchChildComponents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NiagaraService_SearchChildComponents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NiagaraServiceServer).SearchChildComponents(ctx, req.(*SearchChildComponentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NiagaraService_ServiceDesc is the grpc.ServiceDesc for NiagaraService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -393,6 +428,10 @@ var NiagaraService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _NiagaraService_Ping_Handler,
+		},
+		{
+			MethodName: "SearchChildComponents",
+			Handler:    _NiagaraService_SearchChildComponents_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
