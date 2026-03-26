@@ -35,15 +35,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	NiagaraService_ListChildComponents_FullMethodName      = "/mapped.cloud.api.niagara.NiagaraService/ListChildComponents"
-	NiagaraService_FindComponents_FullMethodName           = "/mapped.cloud.api.niagara.NiagaraService/FindComponents"
-	NiagaraService_GetComponentSummary_FullMethodName      = "/mapped.cloud.api.niagara.NiagaraService/GetComponentSummary"
-	NiagaraService_GetComponentDetails_FullMethodName      = "/mapped.cloud.api.niagara.NiagaraService/GetComponentDetails"
-	NiagaraService_GetComponentAncestors_FullMethodName    = "/mapped.cloud.api.niagara.NiagaraService/GetComponentAncestors"
-	NiagaraService_UpsertDeviceSubscription_FullMethodName = "/mapped.cloud.api.niagara.NiagaraService/UpsertDeviceSubscription"
-	NiagaraService_Reset_FullMethodName                    = "/mapped.cloud.api.niagara.NiagaraService/Reset"
-	NiagaraService_Ping_FullMethodName                     = "/mapped.cloud.api.niagara.NiagaraService/Ping"
-	NiagaraService_SearchChildComponents_FullMethodName    = "/mapped.cloud.api.niagara.NiagaraService/SearchChildComponents"
+	NiagaraService_ListChildComponents_FullMethodName         = "/mapped.cloud.api.niagara.NiagaraService/ListChildComponents"
+	NiagaraService_FindComponents_FullMethodName              = "/mapped.cloud.api.niagara.NiagaraService/FindComponents"
+	NiagaraService_GetComponentSummary_FullMethodName         = "/mapped.cloud.api.niagara.NiagaraService/GetComponentSummary"
+	NiagaraService_GetComponentDetails_FullMethodName         = "/mapped.cloud.api.niagara.NiagaraService/GetComponentDetails"
+	NiagaraService_GetComponentAncestors_FullMethodName       = "/mapped.cloud.api.niagara.NiagaraService/GetComponentAncestors"
+	NiagaraService_UpsertDeviceSubscription_FullMethodName    = "/mapped.cloud.api.niagara.NiagaraService/UpsertDeviceSubscription"
+	NiagaraService_Reset_FullMethodName                       = "/mapped.cloud.api.niagara.NiagaraService/Reset"
+	NiagaraService_Ping_FullMethodName                        = "/mapped.cloud.api.niagara.NiagaraService/Ping"
+	NiagaraService_SearchChildComponents_FullMethodName       = "/mapped.cloud.api.niagara.NiagaraService/SearchChildComponents"
+	NiagaraService_UpdateObservabilitySettings_FullMethodName = "/mapped.cloud.api.niagara.NiagaraService/UpdateObservabilitySettings"
 )
 
 // NiagaraServiceClient is the client API for NiagaraService service.
@@ -68,6 +69,8 @@ type NiagaraServiceClient interface {
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 	// Search for child components matching criteria, returning summaries with pagination. More flexible than ListChildComponents.
 	SearchChildComponents(ctx context.Context, in *SearchChildComponentsRequest, opts ...grpc.CallOption) (*SearchChildComponentsResponse, error)
+	// Update the observability settings for the station, such as log level and flush parameters.
+	UpdateObservabilitySettings(ctx context.Context, in *UpdateObservabilitySettingsRequest, opts ...grpc.CallOption) (*UpdateObservabilitySettingsResponse, error)
 }
 
 type niagaraServiceClient struct {
@@ -159,6 +162,15 @@ func (c *niagaraServiceClient) SearchChildComponents(ctx context.Context, in *Se
 	return out, nil
 }
 
+func (c *niagaraServiceClient) UpdateObservabilitySettings(ctx context.Context, in *UpdateObservabilitySettingsRequest, opts ...grpc.CallOption) (*UpdateObservabilitySettingsResponse, error) {
+	out := new(UpdateObservabilitySettingsResponse)
+	err := c.cc.Invoke(ctx, NiagaraService_UpdateObservabilitySettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NiagaraServiceServer is the server API for NiagaraService service.
 // All implementations must embed UnimplementedNiagaraServiceServer
 // for forward compatibility
@@ -181,6 +193,8 @@ type NiagaraServiceServer interface {
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	// Search for child components matching criteria, returning summaries with pagination. More flexible than ListChildComponents.
 	SearchChildComponents(context.Context, *SearchChildComponentsRequest) (*SearchChildComponentsResponse, error)
+	// Update the observability settings for the station, such as log level and flush parameters.
+	UpdateObservabilitySettings(context.Context, *UpdateObservabilitySettingsRequest) (*UpdateObservabilitySettingsResponse, error)
 	mustEmbedUnimplementedNiagaraServiceServer()
 }
 
@@ -214,6 +228,9 @@ func (UnimplementedNiagaraServiceServer) Ping(context.Context, *PingRequest) (*P
 }
 func (UnimplementedNiagaraServiceServer) SearchChildComponents(context.Context, *SearchChildComponentsRequest) (*SearchChildComponentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchChildComponents not implemented")
+}
+func (UnimplementedNiagaraServiceServer) UpdateObservabilitySettings(context.Context, *UpdateObservabilitySettingsRequest) (*UpdateObservabilitySettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateObservabilitySettings not implemented")
 }
 func (UnimplementedNiagaraServiceServer) mustEmbedUnimplementedNiagaraServiceServer() {}
 
@@ -390,6 +407,24 @@ func _NiagaraService_SearchChildComponents_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NiagaraService_UpdateObservabilitySettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateObservabilitySettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NiagaraServiceServer).UpdateObservabilitySettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NiagaraService_UpdateObservabilitySettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NiagaraServiceServer).UpdateObservabilitySettings(ctx, req.(*UpdateObservabilitySettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NiagaraService_ServiceDesc is the grpc.ServiceDesc for NiagaraService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -432,6 +467,10 @@ var NiagaraService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchChildComponents",
 			Handler:    _NiagaraService_SearchChildComponents_Handler,
+		},
+		{
+			MethodName: "UpdateObservabilitySettings",
+			Handler:    _NiagaraService_UpdateObservabilitySettings_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
