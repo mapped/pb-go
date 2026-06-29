@@ -36,6 +36,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	EdgeControlService_WriteProps_FullMethodName = "/mapped.gateway.EdgeControlService/WriteProps"
+	EdgeControlService_ReadProps_FullMethodName  = "/mapped.gateway.EdgeControlService/ReadProps"
 )
 
 // EdgeControlServiceClient is the client API for EdgeControlService service.
@@ -46,6 +47,10 @@ type EdgeControlServiceClient interface {
 	// Request: Unary
 	// Response: Streaming
 	WriteProps(ctx context.Context, in *WritePropsRequest, opts ...grpc.CallOption) (EdgeControlService_WritePropsClient, error)
+	// Read a property from one or more known subtended device(s)
+	// Request: Unary
+	// Response: Streaming
+	ReadProps(ctx context.Context, in *ReadPropsRequest, opts ...grpc.CallOption) (EdgeControlService_ReadPropsClient, error)
 }
 
 type edgeControlServiceClient struct {
@@ -88,6 +93,38 @@ func (x *edgeControlServiceWritePropsClient) Recv() (*WritePropsResponse, error)
 	return m, nil
 }
 
+func (c *edgeControlServiceClient) ReadProps(ctx context.Context, in *ReadPropsRequest, opts ...grpc.CallOption) (EdgeControlService_ReadPropsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &EdgeControlService_ServiceDesc.Streams[1], EdgeControlService_ReadProps_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &edgeControlServiceReadPropsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type EdgeControlService_ReadPropsClient interface {
+	Recv() (*ReadPropsResponse, error)
+	grpc.ClientStream
+}
+
+type edgeControlServiceReadPropsClient struct {
+	grpc.ClientStream
+}
+
+func (x *edgeControlServiceReadPropsClient) Recv() (*ReadPropsResponse, error) {
+	m := new(ReadPropsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // EdgeControlServiceServer is the server API for EdgeControlService service.
 // All implementations must embed UnimplementedEdgeControlServiceServer
 // for forward compatibility
@@ -96,6 +133,10 @@ type EdgeControlServiceServer interface {
 	// Request: Unary
 	// Response: Streaming
 	WriteProps(*WritePropsRequest, EdgeControlService_WritePropsServer) error
+	// Read a property from one or more known subtended device(s)
+	// Request: Unary
+	// Response: Streaming
+	ReadProps(*ReadPropsRequest, EdgeControlService_ReadPropsServer) error
 	mustEmbedUnimplementedEdgeControlServiceServer()
 }
 
@@ -105,6 +146,9 @@ type UnimplementedEdgeControlServiceServer struct {
 
 func (UnimplementedEdgeControlServiceServer) WriteProps(*WritePropsRequest, EdgeControlService_WritePropsServer) error {
 	return status.Errorf(codes.Unimplemented, "method WriteProps not implemented")
+}
+func (UnimplementedEdgeControlServiceServer) ReadProps(*ReadPropsRequest, EdgeControlService_ReadPropsServer) error {
+	return status.Errorf(codes.Unimplemented, "method ReadProps not implemented")
 }
 func (UnimplementedEdgeControlServiceServer) mustEmbedUnimplementedEdgeControlServiceServer() {}
 
@@ -140,6 +184,27 @@ func (x *edgeControlServiceWritePropsServer) Send(m *WritePropsResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _EdgeControlService_ReadProps_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ReadPropsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(EdgeControlServiceServer).ReadProps(m, &edgeControlServiceReadPropsServer{stream})
+}
+
+type EdgeControlService_ReadPropsServer interface {
+	Send(*ReadPropsResponse) error
+	grpc.ServerStream
+}
+
+type edgeControlServiceReadPropsServer struct {
+	grpc.ServerStream
+}
+
+func (x *edgeControlServiceReadPropsServer) Send(m *ReadPropsResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // EdgeControlService_ServiceDesc is the grpc.ServiceDesc for EdgeControlService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -151,6 +216,11 @@ var EdgeControlService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "WriteProps",
 			Handler:       _EdgeControlService_WriteProps_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ReadProps",
+			Handler:       _EdgeControlService_ReadProps_Handler,
 			ServerStreams: true,
 		},
 	},
